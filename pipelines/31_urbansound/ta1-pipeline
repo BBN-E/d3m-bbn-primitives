@@ -1,0 +1,763 @@
+#!/usr/bin/env python3.6
+
+from os import path
+
+import scipy
+from sklearn import preprocessing
+from sklearn.model_selection import StratifiedKFold
+import pandas as pd
+import numpy as np
+import json
+import io
+import argparse
+import tempfile
+import itertools
+import logging
+
+try:
+   import _pickle as pickle
+except:
+   import pickle
+
+try:
+    to_unicode = unicode
+except NameError:
+    to_unicode = str
+
+import os, sys
+import traceback # TODO: remove once debugged
+import collections
+from bbn_primitives.time_series import *
+
+from d3m.container import ndarray, Dataset, List
+from d3m.metadata import hyperparams, params
+from d3m.metadata import base as metadata_base
+from d3m.metadata.base import Metadata
+from d3m import utils
+from d3m.metadata import base as metadata_module
+from d3m.primitive_interfaces import base
+from d3m.primitive_interfaces.transformer import TransformerPrimitiveBase
+from d3m.primitive_interfaces.unsupervised_learning import UnsupervisedLearnerPrimitiveBase
+import d3m.metadata.pipeline
+from d3m import index
+from d3m.metadata.pipeline import Pipeline, PrimitiveStep
+from d3m.metadata.base import ArgumentType
+from d3m.metadata.base import Context as PipelineContext
+from anytree import Node, PreOrderIter
+import uuid
+from pandas.util.testing import assert_frame_equal
+
+import sklearn.metrics
+
+# Example for the documentation of the TA1 pipeline submission process
+#
+# It executes a TA1 pipeline using a ta1-pipeline-config.json file that follows this structure:
+#  {
+#    "train_data":"path/to/train/data/folder/",
+#    "test_data":"path/to/test/data/folder/",
+#    "output_folder":"path/to/output/folder/"
+#  }
+
+logging.basicConfig(level=logging.INFO)
+_logger = logging.getLogger('ta1-pipeline')
+
+#supportedResType =['audio','timeseries']
+supportedResType =['https://metadata.datadrivendiscovery.org/types/FilesCollection','http://schema.org/AudioObject','https://metadata.datadrivendiscovery.org/types/Timeseries']
+supportedTaskType = 'classification'
+supportedTaskSubType = ['multiClass','binary']
+
+AudioDataset = collections.namedtuple(
+        'AudioDataset',
+        [ 'filename', 'start', 'end' ]
+    )
+
+bool_map = {
+    'true': True, 'True': True, 'TRUE': True,
+    'false': False, 'False': False, 'FALSE': False,
+}
+
+
+# add_target_columns_metadata is copied from D3M's runtime.py because the runtime.py was not
+# included in the current release
+def add_target_columns_metadata(dataset, problem_doc_metadata) -> Dataset:
+    """
+    Add metadata to the dataset from problem_doc_metadata
+
+    Paramters
+    ---------
+    dataset
+        Dataset
+    problem_doc_metadata:
+        Metadata about the problemDoc
+    """
+
+    for data in problem_doc_metadata.query(())['inputs']['data']:
+        targets = data['targets']
+        for target in targets:
+            semantic_types = list(dataset.metadata.query(
+                (target['resID'], metadata_base.ALL_ELEMENTS, target['colIndex'])).get('semantic_types', []))
+
+            if 'https://metadata.datadrivendiscovery.org/types/Target' not in semantic_types:
+                semantic_types.append('https://metadata.datadrivendiscovery.org/types/Target')
+                dataset.metadata = dataset.metadata.update(
+                    (target['resID'], metadata_base.ALL_ELEMENTS, target['colIndex']), {'semantic_types': semantic_types})
+
+            if 'https://metadata.datadrivendiscovery.org/types/TrueTarget' not in semantic_types:
+                semantic_types.append('https://metadata.datadrivendiscovery.org/types/TrueTarget')
+                dataset.metadata = dataset.metadata.update(
+                    (target['resID'], metadata_base.ALL_ELEMENTS, target['colIndex']), {'semantic_types': semantic_types})
+
+    return dataset
+
+def load_problem_doc(problem_doc_path: str) -> Metadata:
+    """
+    Load problem_doc from problem_doc_path
+
+    Paramters
+    ---------
+    problem_doc_path
+        Path where the problemDoc.json is located
+    """
+
+    with open(problem_doc_path) as file:
+        problem_doc = json.load(file)
+    return Metadata(problem_doc)
+
+def collapse_frontend(proc_root):
+    raise Exception('Not implemented yet!')
+
+def pickle_and_load_via_tempfile(in_data):
+    tmpf = tempfile.NamedTemporaryFile(mode='wb', delete=False)
+    pickle.dump(in_data, tmpf.file)
+    tmpf.close()
+    out_data = pickle.load(open(tmpf.name, 'rb'))
+    os.remove(tmpf.name)
+    return out_data
+
+def copy_pipeline_via_tempfile(in_root):
+    num_leaves = np.sum([ x.is_leaf for x in PreOrderIter(in_root) ])
+    if num_leaves != 1:
+        raise Exception('Only single processing pipeline supported')
+
+    out_proc_root = Node('proc-root', value=None)
+    out_last_node = out_proc_root
+    for in_step_node in PreOrderIter(in_root):
+        if in_step_node == in_root:
+            continue
+
+        in_proc = in_step_node.value['proc']
+        tmpf = tempfile.TemporaryFile(mode = 'w+b')
+
+        t = type(in_proc)
+        out_proc = t(hyperparams = in_proc.hyperparams)
+        if getattr(out_proc, 'get_params', None) and in_proc.get_params():
+            params = pickle_and_load_via_tempfile(in_proc.get_params())
+            out_proc.set_params(params=params)
+
+        out_last_node = Node(
+                in_step_node.name,
+                value = {
+                    'active': True,
+                    'label': in_step_node.value['label'],
+                    'proc': out_proc,
+                    'proc_output_pfx': in_step_node.value['proc_output_pfx'],
+                },
+                parent = out_last_node)
+
+    return out_proc_root
+
+
+def data_sel(data, selector):
+    if selector is None:
+        return data
+    elif isinstance(data, np.ndarray):
+        return data[selector]
+    elif isinstance(data, scipy.sparse.coo.coo_matrix):
+        return data.toarray()[selector]
+    elif isinstance(data, scipy.sparse.csr.csr_matrix):
+        return data.toarray()[selector]
+    elif isinstance(data, list):
+        return [ data[x] for x in selector ]
+    else:
+        print(type(data))
+        raise Exception('Not implemented yet')
+
+def reset_training_data(proc_step):
+    if isinstance(proc_step, UnsupervisedLearnerPrimitiveBase):
+        proc_step.set_training_data(inputs = None)
+    else:
+        proc_step.set_training_data(inputs = None, outputs = None)
+
+def proc_feats_stratified(inputs, proc_root = None, train = False, train_targets = None,
+               cv_mode = False, trn_index = None, val_index = None):
+    outputs = list()
+    outputs.append(inputs)
+    last_output = inputs
+    last_depth = 0
+    print([ x for x in PreOrderIter(proc_root)])
+    for proc_step_node in PreOrderIter(proc_root):
+        depth = proc_step_node.depth
+        print('depth: %d, last_depth: %d' % (depth, last_depth))
+        # root (depth == 0) is not occupied by any processing
+        if depth == 0:
+            continue
+
+        if not proc_step_node.value['active']:
+            continue
+
+        print(proc_step_node)
+
+        # if we emerse back up in the tree, we don't need outputs computed deeper
+        if not proc_step_node.is_leaf and len(outputs) > depth:
+            print('Clearing data starting at depth %d' % (depth+1))
+            del outputs[depth:]
+
+        # if we emersed, we can't used last_output. We have to use the stored
+        # outputs
+        if depth <= last_depth:
+            print('Retrieving data from depth %d' % (depth-1))
+            last_output = outputs[depth-1]
+
+        if not proc_step_node.value['active']:
+            continue
+
+        proc_step_ex = proc_step_node.value
+        uuid = proc_step_node.name
+        label = proc_step_ex['label']
+        proc_step = proc_step_ex['proc']
+        proc_step_outFN = proc_step_ex['outputFN'] if 'outputFN' in proc_step_ex else None
+
+        if train and not isinstance(proc_step, TransformerPrimitiveBase):
+            try:
+                if isinstance(proc_step, UnsupervisedLearnerPrimitiveBase):
+                    proc_step.set_training_data(inputs = data_sel(last_output, trn_index))
+                else:
+                    proc_step.set_training_data(inputs = data_sel(last_output, trn_index),
+                                                outputs = data_sel(train_targets, trn_index))
+                proc_step.fit()
+            except:
+                print('Training failed, disabling processing subtree')
+                print('-'*60)
+                traceback.print_exc(file=sys.stdout)
+                print('-'*60)
+                reset_training_data(proc_step)
+                for d in proc_step_node.descendants:
+                    d.value['active'] = False
+                continue
+        print(proc_step)
+        product = proc_step.produce(inputs = last_output) # in leaves, only val_index data need to be processed in cv_mode
+        last_output = product.value
+        if train and cv_mode and not isinstance(proc_step, TransformerPrimitiveBase):
+            reset_training_data(proc_step)
+
+        if proc_step_node.is_leaf:
+            if train:
+                acc = np.mean(data_sel(train_targets.iloc[:, -1], val_index) == data_sel(last_output.iloc[:, -1], val_index))
+                if 'acc' not in proc_step_ex:
+                    proc_step_ex['acc'] = list()
+                proc_step_ex['acc'].append(acc)
+        else:
+            # if current node has no siblings, we will need the output only once
+            # at the next deeper level. Hence, we could simply use last_output
+            #outputs.append(last_output if len(proc_step_node.children) > 1 else None)
+            if len(proc_step_node.children) > 1:
+                print('Storing data')
+                outputs.append(last_output)
+            else:
+                outputs.append(None)
+
+        if proc_step_outFN is not None and not cv_mode:
+            with open(proc_step_outFN, 'wb') as fp:
+                pklout = List(x for x in last_output) # this works only for List[ndarray] - fix it when you need it
+                pickle.dump(pklout, fp)
+
+        last_depth = depth
+
+    return last_output
+
+def best_tree_path(proc_root):
+    best_leaf = None
+    best_obj = None
+    for proc_step_node in PreOrderIter(proc_root):
+        if proc_step_node == proc_root:
+            continue
+
+        if not proc_step_node.value['active']:
+            continue
+
+        if proc_step_node.is_leaf:
+            proc_step_ex = proc_step_node.value
+            obj = np.mean(np.array(proc_step_ex['acc']))
+            for node in proc_step_node.path:
+                if node.value is not None:
+                    print(node.value['proc'].hyperparams)
+            print(proc_step_ex)
+            print(obj)
+            if best_leaf is None or obj > best_obj:
+                best_leaf = proc_step_node
+                best_obj = obj
+
+    last_node = None
+    print('Best pipeline:')
+    for node in best_leaf.path:
+        print(node)
+        if node.value is not None:
+            print(node.value['proc'].hyperparams)
+        last_node = Node(node.name, value = node.value, parent = last_node)
+
+    return last_node.root
+
+def get_store_output_fn(store_output_dir = None,
+        store_output_pfx = None,
+        store_output_sfx = None):
+    if not all([ store_output_dir, store_output_pfx, store_output_sfx]):
+        return None
+
+    return os.path.join(store_output_dir,
+            store_output_pfx + '_' + store_output_sfx + '.pkl')
+
+def pipeline(dataset, proc_root = None,
+             resampling_rate = None, train = False, train_targets = None,
+             kCV = 10, stopkCV = None, restype = "timeseries"):
+    # generate or load cached features - curve fittings
+    stopkCV = stopkCV if stopkCV is not None else kCV
+    segm_fittings=dataset
+    if train:
+        num_leaves = np.sum([ x.is_leaf for x in PreOrderIter(proc_root) ])
+
+        if num_leaves == 1:
+            print('Only single processing pipeline defined')
+        else:
+            #print(len(dataset))
+            #print(train_targets)
+            print('Multiple (%d) processing pipelines defined' % num_leaves)
+            k = kCV
+            #for k in range(kCV, 1, -1):
+            for k in range(kCV, 0, -1):
+                try:
+                    for train_index, test_index in StratifiedKFold(k, random_state=0).split(segm_fittings, train_targets):
+                        pass
+                    break
+                except:
+                    print('K-fold split failed for k = %d, will attempt lower k' % k)
+
+            if k > 1:
+                i = 1
+                for train_index, test_index in StratifiedKFold(k, random_state=0).split(segm_fittings, train_targets):
+                    print('Processing fold %d/%d' % (i, k))
+                    proc_feats_stratified(inputs = segm_fittings, proc_root = proc_root,
+                                train = train, train_targets = train_targets,
+                                cv_mode = True, trn_index = train_index, val_index = test_index)
+                    if i == stopkCV:
+                        break
+                    i += 1
+            else:
+                # This means that k-fold splitting could not be done!!!
+                proc_feats_stratified(inputs = segm_fittings, proc_root = proc_root,
+                            train = train, train_targets = train_targets,
+                            cv_mode = True, trn_index = None, val_index = None)
+
+            proc_root = best_tree_path(proc_root)
+
+    last_output = proc_feats_stratified(inputs = segm_fittings, proc_root = proc_root,
+                        train = train, train_targets = train_targets,
+                        cv_mode = False)
+
+    return last_output, proc_root
+
+def decode_test_and_save(testDatasetSchema, proc_root, resampling_rate, restype,
+                         trainTargetsLabelEncoder, problemSchema, testPrimaryKey,
+                         outputFilePath):
+    predictedTargets, tmp = pipeline(testDatasetSchema, proc_root = proc_root,
+                                train = False, resampling_rate = resampling_rate,
+                                restype = restype)
+
+    # Reverse the label encoding for predicted targets
+    predictedTargets = predictedTargets.iloc[:, -1]
+    #predictedTargets = trainTargetsLabelEncoder.inverse_transform(predictedTargets)
+
+    predictedTargets = pd.DataFrame({
+                        'd3mIndex': testDatasetSchema[testPrimaryKey[0][0]]['d3mIndex'],
+                        problemSchema['inputs']['data'][0]['targets'][0]['colName']:predictedTargets
+                    })
+
+    # Outputs the predicted targets in the location specified in the JSON configuration file
+    with open(outputFilePath, 'w') as outputFile:
+        output = predictedTargets.to_csv(outputFile, index=False, columns=['d3mIndex', problemSchema['inputs']['data'][0]['targets'][0]['colName'] ])
+
+    return predictedTargets
+
+
+def create_d3m_pipeline(proc_root, name = None):
+    num_leaves = np.sum([ x.is_leaf for x in PreOrderIter(proc_root) ])
+    if num_leaves != 1:
+        raise Exception('Only single processing pipeline supported')
+
+    pc = PipelineContext.TESTING
+    p = Pipeline(context=pc, name = name)
+    pin = p.add_input("input dataset")
+
+    lout = pin
+    #for module_name in [ 'd3m.primitives.datasets.Denormalize', 'd3m.primitives.datasets.DatasetToDataFrame', 'd3m.primitives.data.ExtractTargets' ]:
+    for module_name in [ 'd3m.primitives.bbn.time_series.TargetsReader', ]:
+        package_name, class_name = module_name.rsplit('.', 1)
+        if package_name not in packages:
+            package_load = __import__(package_name, globals(), locals(), [ class_name, ])
+            packages[package_name] = package_load
+        module = getattr(packages[package_name], class_name)
+        module_hyperparams = module.metadata.query()['primitive_code']['class_type_arguments']['Hyperparams']
+        proc_step = module(hyperparams = module_hyperparams(module_hyperparams.defaults()))
+        ps = PrimitiveStep(
+                  primitive_description = {
+                      'id': proc_step.metadata.query()['id'],
+                      'version': proc_step.metadata.query()['version'],
+                      'python_path': proc_step.metadata.query()['python_path'],
+                      'name': proc_step.metadata.query()['name']
+                  })
+        ps.add_argument("inputs", ArgumentType.CONTAINER, lout)
+        p.add_step(ps)
+        lout = ps.add_output("produce")
+        lout='steps.{i}.{output_id}'.format(i=0, output_id="produce")
+
+    targets_lout = lout
+    lout = pin
+    depth=0
+    for proc_step_node in PreOrderIter(proc_root):
+        depth = proc_step_node.depth
+        if depth == 0:
+            continue
+
+        proc_step_ex = proc_step_node.value
+        #uuid = proc_step_node.name
+        label = proc_step_ex['label']
+        proc_step = proc_step_ex['proc']
+
+        ps = PrimitiveStep(
+                  primitive_description = {
+                      'id': proc_step.metadata.query()['id'],
+                      'version': proc_step.metadata.query()['version'],
+                      'python_path': proc_step.metadata.query()['python_path'],
+                      'name': proc_step.metadata.query()['name']
+                  })
+        ps.add_argument("inputs", ArgumentType.CONTAINER, lout)
+        if proc_step_node.height == 0:
+            ps.add_argument("outputs",ArgumentType.CONTAINER, targets_lout)
+        hps = ps.get_primitive_hyperparams()
+        for hp in hps.configuration.keys():
+            ps.add_hyperparameter(hp, ArgumentType.VALUE,
+                                    proc_step.hyperparams.get(hp))
+        p.add_step(ps)
+        lout = ps.add_output("produce")
+        lout='steps.{i}.{output_id}'.format(i=depth, output_id="produce")
+
+    step_dt= PrimitiveStep(primitive=index.get_primitive('d3m.primitives.data_transformation.dataset_to_dataframe.Common'))
+    step_dt.add_argument(name='inputs', argument_type=ArgumentType.CONTAINER, data_reference='inputs.0')
+    step_dt.add_output('produce')
+    p.add_step(step_dt)
+
+    step_cp= PrimitiveStep(primitive=index.get_primitive('d3m.primitives.data_transformation.construct_predictions.DataFrameCommon'))
+    step_cp.add_argument(name='inputs', argument_type=ArgumentType.CONTAINER, data_reference='steps.{i}.produce'.format(i=depth))
+    step_cp.add_argument(name='reference', argument_type=ArgumentType.CONTAINER, data_reference='steps.{i}.produce'.format(i=depth+1))
+    step_cp.add_output('produce')
+    p.add_step(step_cp)
+
+    lout='steps.{i}.{output_id}'.format(i=depth+2, output_id="produce")
+    pout = p.add_output(lout, "output predictions")
+
+    return p
+
+###############################################################################
+###############        MAIN             #######################################
+###############################################################################
+
+# Parse arguments
+parser = argparse.ArgumentParser(description='TA1 pipeline',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+parser.add_argument('--ta1_config', type=str, default="ta1-pipeline-config.json",
+                   help="ta1 config json file")
+parser.add_argument('--pipeline', type=str, default=None,
+                   help="pipeline json file")
+parser.add_argument('--cachedir', type=str, default=None,
+                   help="directory to cache the extracted features")
+parser.add_argument('-x', action='append',
+                       help="")
+parser.add_argument('--limit_trainN', type=int, default=None,
+                       help="")
+parser.add_argument('--limit_testN', type=int, default=None,
+                       help="")
+parser.add_argument('--collapse_frontend', default=False,
+                       action='store_true', help="")
+parser.add_argument('--test_pickling', default=False,
+                       action='store_true', help="")
+parser.add_argument('--disable_d3m_pipeline_creation', default=False,
+                       action='store_true', help="")
+parser.add_argument('--test_d3m_runtime', default=False,
+                       action='store_true', help="")
+parser.add_argument('--d3m_pipeline_outfn', type=str, default=None,
+                       help="")
+
+args = parser.parse_args()
+
+# Load the json configuration file
+with open(args.ta1_config, 'r') as inputFile:
+    jsonCall = json.load(inputFile)
+    inputFile.close()
+
+# Load the problem description schema
+problem_fn = path.join(jsonCall['train_data'], 'problem_TRAIN', 'problemDoc.json' )
+with open(problem_fn, 'r') as inputFile:
+    problemSchema = json.load(inputFile)
+    inputFile.close()
+
+# Load the json dataset description file
+trainDatasetPath = path.join(jsonCall['train_data'], 'dataset_TRAIN')
+trainDatasetSchema = Dataset.load('file://' + path.join(trainDatasetPath, 'datasetDoc.json'))
+
+print("trainDatasetPath is",trainDatasetPath)
+print('file://' + path.join(trainDatasetPath, 'datasetDoc.json'))
+print("trainDatasetSchema is " , trainDatasetSchema)
+
+
+taskType = problemSchema['about']['taskType']
+if taskType != supportedTaskType:
+    raise Exception('supported tasktype is %s, provided problem is of type %s' % (supportedTaskType, taskType))
+
+taskSubType = problemSchema['about']['taskSubType']
+if taskSubType not in supportedTaskSubType:
+    raise Exception('supported tasktype is %s, provided problem is of type %s' % (supportedTaskSubType, taskSubType))
+
+
+#restype = datasetSchema['dataResources'][0]['resType']
+restype = trainDatasetSchema.metadata.query(('0',))['semantic_types'][0]
+#if restype not in supportedResType:
+#    raise Exception('Supported resType is only %s' % (supportedResType))
+if len(problemSchema['inputs']['data'][0]['targets']) != 1:
+    raise Exception('Only one target expected, %d found in the problem. Exiting.' % (len(trainTargetsColumnIds)))
+
+trainTargetsResIds = problemSchema['inputs']['data'][0]['targets'][0]['resID']
+trainTargetsColumnNames = problemSchema['inputs']['data'][0]['targets'][0]['colName']
+
+trainTargets = np.array(trainDatasetSchema[trainTargetsResIds][trainTargetsColumnNames])
+
+# Load the tabular data file for training, replace missing values, and split it in train data and targets
+testDatasetPath = path.join(jsonCall['test_data'], 'dataset_TEST')
+testDatasetSchema = Dataset.load('file://' + path.join(testDatasetPath, 'datasetDoc.json' ))
+
+metadata = testDatasetSchema.metadata
+num_res = metadata.query(())['dimension']['length']
+resources= [ str(x) for x in range(num_res-1) ]
+resources.append(str(trainTargetsResIds))
+testPrimaryKey = [ [ (res_id, metadata_module.ALL_ELEMENTS, col_id) for col_id in range(metadata.query((res_id, metadata_module.ALL_ELEMENTS))['dimension']['length'])
+                                if 'd3mIndex' == metadata.query((res_id, metadata_module.ALL_ELEMENTS, col_id))['name'] ]
+                            for res_id in resources ]
+flatten = lambda l: [item for sublist in l for item in sublist]
+testPrimaryKey = flatten(testPrimaryKey)
+if len(testPrimaryKey) != 1:
+    raise Exception('One primary key supported')
+
+# Encode the categorical data in the test targets, uses the last target of the dataset as a target
+trainTargetsLabelEncoder = preprocessing.LabelEncoder()
+trainTargetsLabelEncoder = trainTargetsLabelEncoder.fit(trainTargets)
+trainTargets = trainTargetsLabelEncoder.transform(trainTargets)
+
+trainDatasetSchema = add_target_columns_metadata(trainDatasetSchema, Metadata(problemSchema))
+targetsReader = TargetsReader(hyperparams = None)
+trainTargets = targetsReader.produce(inputs = trainDatasetSchema).value
+
+# Train the model
+
+# Build the feature extraction pipeline
+resampling_rate = 16000
+if restype=='http://schema.org/AudioObject' or restype=='https://metadata.datadrivendiscovery.org/types/FilesCollection':
+    resampling_rate = 16000
+elif restype=="https://metadata.datadrivendiscovery.org/types/Timeseries":
+    resampling_rate = 1
+
+mypath = os.path.dirname(os.path.realpath(__file__))
+# Build the classification pipeline
+if args.pipeline:
+    proc_pipeline_fn = args.pipeline
+else:
+    if restype=='http://schema.org/AudioObject':
+        proc_pipeline_fn = os.path.join(mypath, "bbn_pipeline.urbansound.v1.json")
+    else:
+        raise Exception("Not supported by this version")
+        #proc_pipeline_fn = os.path.join(mypath, "proc_tabular.json")
+
+with open(proc_pipeline_fn, 'r') as inputFile:
+    procJson = json.load(inputFile)
+    inputFile.close()
+
+# Overwrite configuration if requested
+if args.x:
+    for x in args.x:
+        k,v = x.split('=')
+        ap = procJson
+        kp = k.split('.')
+        for n in kp[:-1]:
+            print('%s, %s' % (n, ap.keys()))
+            if n not in ap:
+                raise Exception('Can not alter path %s in configuration (node %s not found), define a placeholder in the config file first' % (k, n))
+            ap = ap[n]
+
+        try:
+            v = int(v)
+        except:
+            try:
+                v = float(v)
+            except:
+                pass
+
+        ap[kp[-1]] = v
+
+print('Final procJson configuration:')
+print(procJson)
+
+# Create processing tree
+packages = dict()
+proc_root = Node('proc-root', value=None)
+current_parents = [ proc_root, ]
+for proc_label in procJson:
+    current_nodes = list()
+    current_instances = list()
+    print(proc_label)
+    print(procJson[proc_label]['proc'])
+    module_name = procJson[proc_label]['proc']
+    fixed_hyperparams = dict()
+    tunable_hyperparams = dict()
+    if 'hyperparams' in procJson[proc_label]:
+        hyperparams = procJson[proc_label]['hyperparams']
+        for k, v in hyperparams.items():
+            if isinstance(v, dict):
+                if 'type' in v and v['type'] == "[[:AUTOTUNE:]]" and isinstance(v['vals'], list):
+                    tunable_hyperparams[k] = [
+                        bool_map[x] if isinstance(x, str) and x in bool_map
+                        else List(x) if isinstance(x, list) else x for x in v['vals'] ]
+                else:
+                    raise Exception('Unsupported dict entry encountered for primitive %s, key  %s' % (x, k))
+            else:
+                fixed_hyperparams[k] = bool_map[v] if isinstance(v, str) and v in bool_map else List(v) if isinstance(v, list) else v
+
+    package_name, class_name = module_name.rsplit('.', 1)
+    if package_name not in packages:
+        package_load = __import__(package_name, globals(), locals(), [ class_name, ])
+        packages[package_name] = package_load
+    module = getattr(packages[package_name], class_name)
+    module_hyperparams = module.metadata.query()['primitive_code']['class_type_arguments']['Hyperparams']
+
+    if tunable_hyperparams:
+        for vals in itertools.product(*tunable_hyperparams.values()):
+            current_hyperparams = { k:v for k,v in zip(tunable_hyperparams.keys(), vals) }
+            instance = module(hyperparams = module_hyperparams(module_hyperparams.defaults(),
+                **fixed_hyperparams, **current_hyperparams))
+            current_instances.append(instance)
+    else:
+        instance = module(hyperparams = module_hyperparams(module_hyperparams.defaults(),
+            **fixed_hyperparams))
+        current_instances.append(instance)
+
+    proc_output_pfx = procJson[proc_label]['store_output_pfx'] if 'store_output_pfx' in procJson[proc_label] else None
+
+    for instance in current_instances:
+        instance_nodes = [ Node(uuid.uuid4().hex,
+                                value={
+                                    'active': True,
+                                    'label': proc_label,
+                                    'proc': instance,
+                                    'proc_output_pfx': proc_output_pfx,
+                                },
+                                parent=x) for x in current_parents ]
+        current_nodes += instance_nodes
+
+    current_parents = current_nodes
+
+#if args.collapse_front_end:
+#    collapse_front_end(proc_root)
+fext_pipeline = None
+
+trainCacheFN = None
+trainPredict, proc_root = pipeline(trainDatasetSchema, proc_root = proc_root,
+                        train = True, train_targets = trainTargets, resampling_rate = resampling_rate,
+                         stopkCV = 2, restype = restype)
+trainPredict = trainPredict.iloc[:, -1]
+
+acc = np.mean(trainTargets.iloc[:, -1]  == trainPredict)
+print('Training accuracy: %f\n' % (acc))
+confmat = sklearn.metrics.confusion_matrix(trainTargets.iloc[:, -1], trainPredict)
+print('Training confusion matrix: \n%s\n\n' % (confmat))
+
+outputFilePath = path.join(jsonCall['output_folder'], problemSchema['expectedOutputs']['predictionsFile'])
+pred1 = decode_test_and_save(testDatasetSchema, proc_root, resampling_rate, restype,
+                         trainTargetsLabelEncoder, problemSchema, testPrimaryKey,
+                         outputFilePath)
+
+# Test pickling
+if args.test_pickling:
+    # Try to copy the pipeline - test pickling and loading of params
+    proc_root_copy = copy_pipeline_via_tempfile(proc_root)
+
+    outputFilePath = path.join(jsonCall['output_folder'], 'repl_' + problemSchema['expectedOutputs']['predictionsFile'])
+    pred2 = decode_test_and_save(testDatasetSchema, proc_root_copy, resampling_rate, restype,
+                            trainTargetsLabelEncoder, problemSchema, testPrimaryKey,
+                            outputFilePath)
+    assert_frame_equal(pred1, pred2)
+
+# Write D3M pipeline
+if not args.disable_d3m_pipeline_creation:
+    d3m_pipeline = create_d3m_pipeline(proc_root, name = proc_pipeline_fn)
+    if args.d3m_pipeline_outfn is None:
+        pipelineJsonOutFN = path.join(jsonCall['output_folder'], 'pipeline.json')
+    else:
+        pipelineJsonOutFN = args.d3m_pipeline_outfn
+    with io.open(pipelineJsonOutFN, 'w', encoding='utf8') as outfile:
+        str_ = d3m_pipeline.to_json_structure()
+        str_['pipeline_rank'] = 1
+        str_ = json.dumps(str_,
+                        indent=4, sort_keys=True) #, ensure_ascii=False)
+        outfile.write(to_unicode(str_))
+
+    if args.test_d3m_runtime:
+        print('Testing D3M runtime')
+        from d3m.metadata.pipeline import Pipeline
+        from d3m import runtime
+        problem_doc = load_problem_doc(problem_fn)
+        dataset = Dataset.load('file://' + path.join(trainDatasetPath, 'datasetDoc.json'))
+        dataset = add_target_columns_metadata(dataset, problem_doc)
+
+        #semantic_types = ["https://metadata.datadrivendiscovery.org/types/CategoricalData",
+        #                    "https://metadata.datadrivendiscovery.org/types/SuggestedTarget",
+        #                    "https://metadata.datadrivendiscovery.org/types/Target",
+        #                    "https://metadata.datadrivendiscovery.org/types/TrueTarget"]
+        #dataset.metadata = dataset.metadata.update(('1', metadata_base.ALL_ELEMENTS, 5), {'semantic_types': semantic_types})
+
+        print('D3M runtime - fit')
+        d3m_pipeline = Pipeline.from_json(string_or_file=open(pipelineJsonOutFN))
+        pc = PipelineContext.TESTING
+        run = runtime.Runtime(d3m_pipeline,context=pc)
+        run.fit(inputs=[dataset])
+        pickle_pipeline_fn = path.join(jsonCall['output_folder'], 'pipeline-fitted.pkl')
+        pickle.dump(run, open(pickle_pipeline_fn, 'wb'))
+
+
+        print('D3M runtime - produce')
+        dataset = Dataset.load('file://' + path.join(testDatasetPath, 'datasetDoc.json' ))
+        dataset = add_target_columns_metadata(dataset, problem_doc)
+        run2 = pickle.load(open(pickle_pipeline_fn, 'rb'))
+        output = run2.produce(inputs=[dataset])
+        output = output.values['outputs.0']
+        output = output.iloc[:, -1]
+        outputFilePath = path.join(jsonCall['output_folder'], 'd3m-repl_' + problemSchema['expectedOutputs']['predictionsFile'])
+        #with open(outputFilePath, 'wt') as f:
+        #    for x in output:
+        #        f.write(str(x))
+        predictedTargets = pd.DataFrame({
+                            'd3mIndex': testDatasetSchema[testPrimaryKey[0][0]]['d3mIndex'],
+                            problemSchema['inputs']['data'][0]['targets'][0]['colName']:output
+                        })
+        with open(outputFilePath, 'w') as outputFile:
+            output = predictedTargets.to_csv(outputFile, index=False, columns=['d3mIndex', problemSchema['inputs']['data'][0]['targets'][0]['colName'] ])
+        #assert_frame_equal(pred1, predictedTargets)
+
+#path  = '/d4m/ears/expts/45980_31_urbansound_small.create_corpus.a/expts/31_urbansound.small/TEST/dataset_TEST/datasetDoc.json'
+

@@ -1,3 +1,3 @@
 # What is this repo about?
 
-This repository will contain set of BBN's TA1 primitives
+This repository contains set of BBN's TA1 primitives

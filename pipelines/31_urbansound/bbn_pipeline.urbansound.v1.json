@@ -1,0 +1,96 @@
+{
+  "audio_reader":
+  {
+    "proc": "bbn_primitives.time_series.AudioReader"
+  },
+  "channel_mixer":
+  {
+    "proc": "bbn_primitives.time_series.ChannelAverager"
+  },
+  "dither":
+  {
+    "proc": "bbn_primitives.time_series.SignalDither"
+  },
+  "framer":
+  {
+    "proc": "bbn_primitives.time_series.SignalFramer",
+    "hyperparams": {
+        "frame_length_s": 0.025,
+        "frame_shift_s": 0.010
+    }
+  },
+  "mfcc":
+  {
+    "proc": "bbn_primitives.time_series.SignalMFCC",
+    "hyperparams": {
+        "num_ceps": 3
+    }
+  },
+  "segm":
+  {
+    "proc": "bbn_primitives.time_series.UniformSegmentation"
+  },
+  "segm_fitter":
+  {
+    "proc": "bbn_primitives.time_series.SegmentCurveFitter",
+    "hyperparams": {
+        "deg": 2
+    },
+    "store_output_pfx": "fext"
+  },
+  "clusterer":
+  {
+    "proc": "bbn_primitives.time_series.ClusterCurveFittingKMeans",
+    "hyperparams": {
+        "n_init": 10,
+        "n_clusters": {
+            "type": "[[:AUTOTUNE:]]",
+            "vals": [512 ]
+        },
+        "max_iter": 300
+    },
+    "store_output_pfx": "clusterer"
+  },
+  "fittings_framer":
+  {
+    "proc": "bbn_primitives.time_series.SignalFramer",
+    "hyperparams": {
+        "frame_length_s": 1,
+        "frame_shift_s": 1,
+        "flatten_output": "False"
+    }
+  },
+  "fittings_to_bot":
+  {
+    "proc": "bbn_primitives.time_series.SequenceToBagOfTokens"
+  },
+  "tfidf":
+  {
+    "proc": "bbn_primitives.time_series.BBNTfidfTransformer",
+    "hyperparams": {
+        "norm": "l2",
+        "use_idf": "True",
+        "smooth_idf": "True",
+        "sublinear_tf": "True"
+    }
+  },
+  "seq_modeler":
+  {
+    "proc": "d3m.primitives.sklearn_wrap.SKLinearSVC",
+    "hyperparams": {
+        "penalty": "l2",
+        "loss": "squared_hinge",
+        "dual": "True",
+        "tol": 0.0001,
+        "C": {
+            "type": "[[:AUTOTUNE:]]",
+            "vals": [ 0.1      ]
+        },
+        "multi_class": "ovr",
+        "fit_intercept": "True",
+        "intercept_scaling": 1,
+        "class_weight": "balanced",
+        "max_iter": 1000
+    }
+  }
+}

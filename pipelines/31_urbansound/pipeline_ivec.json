@@ -1,13 +1,13 @@
 {
     "context": "TESTING",
-    "created": "2019-02-18T20:30:04.553412Z",
-    "digest": "8831dff4858bd67a08da7282548cc4440bb13122f87898269bbc5b5f7e24f347",
-    "id": "3b3c2594-91b3-44cb-b5dd-84ba42bba14c",
+    "created": "2019-04-15T18:18:19.378082Z",
+    "digest": "c44a9b81317676291cefdd4e3168875c9fcbd7873f9bf392aeb490a638728505",
+    "id": "7774b56c-771b-4c1c-b113-e14c9616d868",
     "inputs": [
         {
             "name": "input dataset"
         }
-    ], 
+    ],
     "outputs": [
         {
             "data": "steps.9.produce",
@@ -30,7 +30,7 @@
                 }
             ],
             "primitive": {
-                "digest": "a8a8c23d89a0963f98a92e08951835c173465135e067e5c962d810d80c0ee290",
+                "digest": "d1fd1d4852d622df024e785cdd9d409c427b4085f12c4cbd8d89e3f637677e48",
                 "id": "952b659c-d290-465b-9e89-160947e29c06",
                 "name": "Targets Reader",
                 "python_path": "d3m.primitives.bbn.time_series.TargetsReader",
@@ -61,7 +61,7 @@
                 }
             ],
             "primitive": {
-                "digest": "7c5fdc68600ab7fcb8303674ffcac0505d33783d3f634087c079233c4017c54c",
+                "digest": "d4124ad8db51e12128b414411e3641d78f70770f18a868f9d3579e22bb216900",
                 "id": "503e69a1-5fc4-4f14-912a-4b564cb1b171",
                 "name": "Audio Reader",
                 "python_path": "d3m.primitives.bbn.time_series.AudioReader",
@@ -82,7 +82,7 @@
                 }
             ],
             "primitive": {
-                "digest": "42ea91c299884678488ecfcf98c562941a2a4957b3fe7af51b3ebb5d1204786d",
+                "digest": "31a7c6210cb78fd054a32add6ab5d910b9deb4b9e96bea33c98f38a9ba91b330",
                 "id": "35afd4db-e11d-4e2d-a780-9e123b752bd7",
                 "name": "Channel Averager",
                 "python_path": "d3m.primitives.bbn.time_series.ChannelAverager",
@@ -113,7 +113,7 @@
                 }
             ],
             "primitive": {
-                "digest": "f0683abbe88f60d570694ffe7106cdd965a71240f06d7bfcffdf6cbd9ad24642",
+                "digest": "183e5ea348a491f3effc1d403e5ad48248429e15d96af110f429e2420e95d0c3",
                 "id": "1ea935ec-e767-4a18-bbd5-b5f66855f4f3",
                 "name": "Signal Dithering",
                 "python_path": "d3m.primitives.bbn.time_series.SignalDither",
@@ -148,7 +148,7 @@
                 }
             ],
             "primitive": {
-                "digest": "19da09c3ace416f2974da21fb99c0947ba7724d10c91d9b2ea9b2aa26eab02ea",
+                "digest": "97c3ac2f3958f634a61348ca8ab140a3dfc9814eb5d3e7fd89a7ea0bb55df209",
                 "id": "4d7160ef-ca70-4150-b513-36b90817ba45",
                 "name": "Signal Framing",
                 "python_path": "d3m.primitives.bbn.time_series.SignalFramer",
@@ -199,7 +199,7 @@
                 }
             ],
             "primitive": {
-                "digest": "2e2cb09abb74eed6d9ba97d6e7ea98cd49dc5789fa595e996adeb761abf6cc57",
+                "digest": "a411021b696fed73196deef9032ca02b5ac9f53bc67934aa77be05da09196ba0",
                 "id": "a184a1d1-3187-4d1f-99c6-e1d5665c2c99",
                 "name": "MFCC Feature Extraction",
                 "python_path": "d3m.primitives.bbn.time_series.SignalMFCC",
@@ -246,7 +246,7 @@
                 }
             ],
             "primitive": {
-                "digest": "88663af042c0530b897307954cead6883185d7fd5708acdbfc62335ac2a17d95",
+                "digest": "9de5973af8ba4d440e21e3faa6266077429a65cdc527075066e1ecfca6b2bafa",
                 "id": "1c5080bd-7b2f-4dbb-ac5f-0a65b59526a7",
                 "name": "I-vector extractor",
                 "python_path": "d3m.primitives.bbn.time_series.IVectorExtractor",
@@ -299,7 +299,7 @@
                     "type": "VALUE"
                 },
                 "hidden_layer_sizes": {
-                    "data": "gANjY29weXJlZwpfcmVjb25zdHJ1Y3RvcgpxAGNkM20uY29udGFpbmVyLmxpc3QKTGlzdApxAWNidWlsdGlucwpsaXN0CnECXXEDKEvIS8hlh3EEUnEFfXEGWAgAAABtZXRhZGF0YXEHY2QzbS5tZXRhZGF0YS5iYXNlCkRhdGFNZXRhZGF0YQpxCCmBcQl9cQooWBEAAABfY3VycmVudF9tZXRhZGF0YXELY2QzbS5tZXRhZGF0YS5iYXNlCk1ldGFkYXRhRW50cnkKcQwpgXENfXEOKFgIAAAAZWxlbWVudHNxD31xEFgMAAAAYWxsX2VsZW1lbnRzcRFoDCmBcRJ9cRMoaA99cRRoEU5oB2Nmcm96ZW5kaWN0CkZyb3plbk9yZGVyZWREaWN0CnEVKYFxFn1xFyhYBQAAAF9kaWN0cRhjY29sbGVjdGlvbnMKT3JkZXJlZERpY3QKcRkpUnEaWA8AAABzdHJ1Y3R1cmFsX3R5cGVxG2NidWlsdGlucwppbnQKcRxzWAUAAABfaGFzaHEdTnVidWJoB2gVKYFxHn1xHyhoGGgZKVJxIChYBgAAAHNjaGVtYXEhWEIAAABodHRwczovL21ldGFkYXRhLmRhdGFkcml2ZW5kaXNjb3Zlcnkub3JnL3NjaGVtYXMvdjAvY29udGFpbmVyLmpzb25xImgbaAFYCQAAAGRpbWVuc2lvbnEjaBUpgXEkfXElKGgYaBkpUnEmWAYAAABsZW5ndGhxJ0sCc2gdTnVidWgdTnVidWJoHU5YCQAAAGZvcl92YWx1ZXEoaAV1YnNiLg==",
+                    "data": "gANjY29weXJlZwpfcmVjb25zdHJ1Y3RvcgpxAGNkM20uY29udGFpbmVyLmxpc3QKTGlzdApxAWNidWlsdGlucwpsaXN0CnECXXEDKEvIS8hlh3EEUnEFfXEGWAgAAABtZXRhZGF0YXEHY2QzbS5tZXRhZGF0YS5iYXNlCkRhdGFNZXRhZGF0YQpxCCmBcQl9cQooWBEAAABfY3VycmVudF9tZXRhZGF0YXELY2QzbS5tZXRhZGF0YS5iYXNlCk1ldGFkYXRhRW50cnkKcQwpgXENTn1xDihYCAAAAGVsZW1lbnRzcQ9jZDNtLnV0aWxzCnBtYXAKcRB9cRGFcRJScRNYDAAAAGFsbF9lbGVtZW50c3EUTmgHY2Zyb3plbmRpY3QKRnJvemVuT3JkZXJlZERpY3QKcRUpgXEWfXEXKFgFAAAAX2RpY3RxGGNjb2xsZWN0aW9ucwpPcmRlcmVkRGljdApxGSlScRpYBQAAAF9oYXNocRtOdWJYCAAAAGlzX2VtcHR5cRyIWBEAAABpc19lbGVtZW50c19lbXB0eXEdiHWGcR5iaBtOdWJzYi4=",
                     "type": "VALUE"
                 },
                 "learning_rate": {
@@ -349,7 +349,7 @@
                 }
             ],
             "primitive": {
-                "digest": "5fdb649ac458f0d2401b6e312e4ecca01a1fffdfc581b24044864e2c1cdf5143",
+                "digest": "f78fb46aa5bbd1c87188a54316a0517ecb2f237851e18c5d9d5c42e861e45dfa",
                 "id": "cdb18166-e2ca-4418-b5a4-fffbe98f7844",
                 "name": "BBN MLP Classifier",
                 "python_path": "d3m.primitives.bbn.sklearn_wrap.BBNMLPClassifier",
@@ -370,7 +370,7 @@
                 }
             ],
             "primitive": {
-                "digest": "e874f753b62534905e24f0e112e611e0de2894b28eb6f6c034c3fab2e0ad70c5",
+                "digest": "b2b1e51b685042419e874a306fb62d572c2c5b4a41276390cbed50ce4d46a026",
                 "id": "4b42ce1e-9b98-4a25-b68e-fad13311eb65",
                 "name": "Extract a DataFrame from a Dataset",
                 "python_path": "d3m.primitives.data_transformation.dataset_to_dataframe.Common",
@@ -395,7 +395,7 @@
                 }
             ],
             "primitive": {
-                "digest": "413973e313aaf98a066c324174b85ae9ab16ae0e983a964885248766b82c930a",
+                "digest": "a70660e740e4a69f4bf3e61e9d8264fea931f9daa184e4a09f0e7a78f47ee294",
                 "id": "8d38b340-f83f-4877-baaa-162f8e551736",
                 "name": "Construct pipeline predictions output",
                 "python_path": "d3m.primitives.data_transformation.construct_predictions.DataFrameCommon",

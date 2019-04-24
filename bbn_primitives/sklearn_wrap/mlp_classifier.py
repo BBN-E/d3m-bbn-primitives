@@ -198,7 +198,7 @@ class BBNMLPClassifier(SupervisedLearnerPrimitiveBase[Inputs, Outputs, Params, H
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/sklearn_wrap/mlp_classifier.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/sklearn_wrap/mlp_classifier.py'.format(
                     git_commit=__git_commit__
                 ),
                 'https://github.com/BBN-E/d3m-bbn-primitives.git',

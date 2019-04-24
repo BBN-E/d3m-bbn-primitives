@@ -61,7 +61,7 @@ class SequenceToBagOfTokens(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Pa
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/time_series/sequence_to_bot.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/sequence_to_bot.py'.format(
                     git_commit=__git_commit__
                 ),
                 'https://github.com/BBN-E/d3m-bbn-primitives.git',

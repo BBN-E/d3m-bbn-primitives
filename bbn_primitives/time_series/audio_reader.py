@@ -68,7 +68,7 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/time_series/audio_reader.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/audio_reader.py'.format(
                     git_commit=__git_commit__
                 ),
                 'https://github.com/BBN-E/d3m-bbn-primitives.git',

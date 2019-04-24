@@ -111,7 +111,7 @@ class SignalMFCC(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpar
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/time_series/signal_mfcc.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/signal_mfcc.py'.format(
                     git_commit=__git_commit__
                 ),
                 'https://github.com/BBN-E/d3m-bbn-primitives.git',

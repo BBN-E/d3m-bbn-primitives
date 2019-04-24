@@ -84,7 +84,7 @@ class ClusterCurveFittingKMeans(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/time_series/cluster_curve_fitting_kmeans.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/cluster_curve_fitting_kmeans.py'.format(
                     git_commit=__git_commit__
                 ),
                 'https://github.com/BBN-E/d3m-bbn-primitives.git',

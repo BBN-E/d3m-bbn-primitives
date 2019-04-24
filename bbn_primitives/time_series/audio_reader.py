@@ -68,10 +68,10 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
             'name': __author__,
             'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
-                'https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/audio_reader.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives.git/{git_commit}/bbn_primitives/time_series/audio_reader.py'.format(
                     git_commit=__git_commit__
                 ),
-                'https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives.git',
+                'https://github.com/BBN-E/d3m-bbn-primitives.git',
             ],
         },
         'installation': [{
@@ -81,7 +81,7 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
             },
             {
                 'type': 'PIP',
-                'package_uri': 'git+https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives.git@{git_commit}#egg={egg}'.format(
+                'package_uri': 'git+https://github.com/BBN-E/d3m-bbn-primitives.git@{git_commit}#egg={egg}'.format(
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],

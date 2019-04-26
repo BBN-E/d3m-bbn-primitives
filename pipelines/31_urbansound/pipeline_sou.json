@@ -1,13 +1,13 @@
 {
     "context": "TESTING",
-    "created": "2019-04-23T19:01:49.826686Z",
-    "digest": "f22a1ac5840a3adbd950738bc6c8ade7efb64d2c251e8f104fe0baf5b50c8e5a",
+    "created": "2019-04-26T15:02:15.755677Z",
+    "digest": "5cb4f0fd786c8b5253a31d6fd4320bd47fb3f3877d70c63ba76a4e7075913b72",
     "id": "a0aded7e-9d7c-42db-90dd-28624b7f2f06",
     "inputs": [
         {
             "name": "input dataset"
         }
-    ],
+    ], 
     "outputs": [
         {
             "data": "steps.14.produce",
@@ -30,7 +30,7 @@
                 }
             ],
             "primitive": {
-                "digest": "d1fd1d4852d622df024e785cdd9d409c427b4085f12c4cbd8d89e3f637677e48",
+                "digest": "2b42b747dd666de548b896eab7cc4ba612942722b292b76c716c62bb193bc24b",
                 "id": "952b659c-d290-465b-9e89-160947e29c06",
                 "name": "Targets Reader",
                 "python_path": "d3m.primitives.bbn.time_series.TargetsReader",
@@ -61,7 +61,7 @@
                 }
             ],
             "primitive": {
-                "digest": "d4124ad8db51e12128b414411e3641d78f70770f18a868f9d3579e22bb216900",
+                "digest": "d641c1451a5e32b9e3d194b76786e0633ac1c87fc1991d79766d18480d4e709b",
                 "id": "503e69a1-5fc4-4f14-912a-4b564cb1b171",
                 "name": "Audio Reader",
                 "python_path": "d3m.primitives.bbn.time_series.AudioReader",
@@ -82,7 +82,7 @@
                 }
             ],
             "primitive": {
-                "digest": "31a7c6210cb78fd054a32add6ab5d910b9deb4b9e96bea33c98f38a9ba91b330",
+                "digest": "e28a0b12076fb02fc65b602f77c61f0bb5a58235539fc5aab2f676b474623cae",
                 "id": "35afd4db-e11d-4e2d-a780-9e123b752bd7",
                 "name": "Channel Averager",
                 "python_path": "d3m.primitives.bbn.time_series.ChannelAverager",
@@ -113,7 +113,7 @@
                 }
             ],
             "primitive": {
-                "digest": "183e5ea348a491f3effc1d403e5ad48248429e15d96af110f429e2420e95d0c3",
+                "digest": "e5a2e45a1c2e5be52d2a35b5b5254ef8390a5240841bb3361ba1ba03dc3b01fe",
                 "id": "1ea935ec-e767-4a18-bbd5-b5f66855f4f3",
                 "name": "Signal Dithering",
                 "python_path": "d3m.primitives.bbn.time_series.SignalDither",
@@ -148,7 +148,7 @@
                 }
             ],
             "primitive": {
-                "digest": "97c3ac2f3958f634a61348ca8ab140a3dfc9814eb5d3e7fd89a7ea0bb55df209",
+                "digest": "008c928af3b5c71f818f3b0ca6c5a401d19141a10452da981024ce389d4a2c92",
                 "id": "4d7160ef-ca70-4150-b513-36b90817ba45",
                 "name": "Signal Framing",
                 "python_path": "d3m.primitives.bbn.time_series.SignalFramer",
@@ -199,7 +199,7 @@
                 }
             ],
             "primitive": {
-                "digest": "a411021b696fed73196deef9032ca02b5ac9f53bc67934aa77be05da09196ba0",
+                "digest": "9bd35e487c6c528d974c67050dd9d83fb8f8c2490c9df8222c43207d2ba1f183",
                 "id": "a184a1d1-3187-4d1f-99c6-e1d5665c2c99",
                 "name": "MFCC Feature Extraction",
                 "python_path": "d3m.primitives.bbn.time_series.SignalMFCC",
@@ -230,7 +230,7 @@
                 }
             ],
             "primitive": {
-                "digest": "2c21afb754fe58fe6d0985a3a91ae03318b7d52a8f7150a6ee79560f99d56d74",
+                "digest": "50dc422d24da6d97bd3d9f1c2941cbbb4e2cbea20c413255d4f7ec3410655371",
                 "id": "2a6f820a-3943-4bb7-a580-689a91c338f3",
                 "name": "Uniform Segmentation",
                 "python_path": "d3m.primitives.bbn.time_series.UniformSegmentation",
@@ -257,7 +257,7 @@
                 }
             ],
             "primitive": {
-                "digest": "3e5ae0e3846878ac04bb87909fdcd8bbf0abf0b2a55124da2290a575f5839224",
+                "digest": "e3dc7b120223cd291d064cdeaf978073d6d889af302d080a1ee87d199e680edb",
                 "id": "7c1d88a3-2388-4ba8-97c6-aa0aa2673024",
                 "name": "Segment Curve Fitter",
                 "python_path": "d3m.primitives.bbn.time_series.SegmentCurveFitter",
@@ -292,7 +292,7 @@
                 }
             ],
             "primitive": {
-                "digest": "1f73f24fff8efe216f29d6a775157d447ef2d7c07cf2fa5fe4830e3de304d18e",
+                "digest": "fb4ff8eb5924b9be8962ccee9d46964e6f0e7957b57fd005e6e9c854f47ba567",
                 "id": "b358a1fd-8bf8-4991-935f-2f1806dae54d",
                 "name": "Clustering for Curve Fitting",
                 "python_path": "d3m.primitives.bbn.time_series.ClusterCurveFittingKMeans",
@@ -327,7 +327,7 @@
                 }
             ],
             "primitive": {
-                "digest": "97c3ac2f3958f634a61348ca8ab140a3dfc9814eb5d3e7fd89a7ea0bb55df209",
+                "digest": "008c928af3b5c71f818f3b0ca6c5a401d19141a10452da981024ce389d4a2c92",
                 "id": "4d7160ef-ca70-4150-b513-36b90817ba45",
                 "name": "Signal Framing",
                 "python_path": "d3m.primitives.bbn.time_series.SignalFramer",
@@ -348,7 +348,7 @@
                 }
             ],
             "primitive": {
-                "digest": "786b3c022ccc6a25a2409f269f48cfb4081f511092a819e17871cb2f028bab2a",
+                "digest": "6b8be562aeb66f420f3f57eb03be9df23d6374a77e504bdd0b22fa8cab8f268b",
                 "id": "bdcceba0-b6bd-4611-92de-225e3353f07d",
                 "name": "Sequence to Bag-of-Tokens transformer",
                 "python_path": "d3m.primitives.bbn.time_series.SequenceToBagOfTokens",
@@ -387,7 +387,7 @@
                 }
             ],
             "primitive": {
-                "digest": "80bdd2d09ca298a98a1fabd39b81058f948a683b70eb203474596fea96f23f42",
+                "digest": "5281293136af3be3e2ba80ea4d04aad4e994abb1dc00bb67d11fb2c6f4ddd6bf",
                 "id": "fefcb78f-c2f5-4557-a23b-0910b2127769",
                 "name": "Tfidf Transformer",
                 "python_path": "d3m.primitives.bbn.time_series.BBNTfidfTransformer",
@@ -490,7 +490,7 @@
                 }
             ],
             "primitive": {
-                "digest": "f78fb46aa5bbd1c87188a54316a0517ecb2f237851e18c5d9d5c42e861e45dfa",
+                "digest": "6dcb62626fd22f63fa0f006506cf81459dffa75482789c8cdec3b211cbd510e6",
                 "id": "cdb18166-e2ca-4418-b5a4-fffbe98f7844",
                 "name": "BBN MLP Classifier",
                 "python_path": "d3m.primitives.bbn.sklearn_wrap.BBNMLPClassifier",
@@ -511,7 +511,7 @@
                 }
             ],
             "primitive": {
-                "digest": "b1c248751b314d78349de9c5590f3e970e1c5514b78a90707f4dc267c4ca7bf1",
+                "digest": "1e0fc07f5306223300e3966c50daf7a5f2095d201d316b31cdc86e48a5f98b4a",
                 "id": "4b42ce1e-9b98-4a25-b68e-fad13311eb65",
                 "name": "Extract a DataFrame from a Dataset",
                 "python_path": "d3m.primitives.data_transformation.dataset_to_dataframe.Common",
@@ -536,7 +536,7 @@
                 }
             ],
             "primitive": {
-                "digest": "a16e280fce14ef80dba3035c1dbf0e2571fe7d02acd95b05f2787fd1886484e4",
+                "digest": "d62af6fae9ea50a5bf034d13ac67f117b62ff9c06152dcbbfdd5312136a4d80a",
                 "id": "8d38b340-f83f-4877-baaa-162f8e551736",
                 "name": "Construct pipeline predictions output",
                 "python_path": "d3m.primitives.data_transformation.construct_predictions.DataFrameCommon",

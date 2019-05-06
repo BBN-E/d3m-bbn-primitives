@@ -125,7 +125,7 @@ class SignalMFCC(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpar
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.bbn.time_series.SignalMFCC', #'d3m.primitives.feature_extraction.signal_mfcc.BBN',
+        'python_path': 'd3m.primitives.feature_extraction.SignalMFCC.BBN', #'d3m.primitives.bbn.time_series.SignalMFCC', #'d3m.primitives.feature_extraction.signal_mfcc.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.MFCC_FEATURE_EXTRACTION],

@@ -97,7 +97,7 @@ class ClusterCurveFittingKMeans(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.bbn.time_series.ClusterCurveFittingKMeans', #'d3m.primitives.clustering.cluster_curve_fitting_kmeans.BBN',
+        'python_path': 'd3m.primitives.clustering.ClusterCurveFittingKMeans.BBN',#'d3m.primitives.bbn.time_series.ClusterCurveFittingKMeans', #'d3m.primitives.clustering.cluster_curve_fitting_kmeans.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.K_MEANS_CLUSTERING],

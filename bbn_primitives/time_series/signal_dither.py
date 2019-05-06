@@ -79,7 +79,7 @@ class SignalDither(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.bbn.time_series.SignalDither', #'d3m.primitives.data_preprocessing.signal_dither.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.SignalDither.BBN', #'d3m.primitives.bbn.time_series.SignalDither', #'d3m.primitives.data_preprocessing.signal_dither.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.SIGNAL_DITHERING],

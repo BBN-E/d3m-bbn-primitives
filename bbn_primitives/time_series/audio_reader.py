@@ -85,7 +85,7 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.bbn.time_series.AudioReader', #'d3m.primitives.data_preprocessing.audio_reader.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.AudioReader.BBN', #'d3m.primitives.bbn.time_series.AudioReader', #'d3m.primitives.data_preprocessing.audio_reader.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION], #['DATA_CONVERSION'], #  replaced 'AUDIO_MIXING'
         'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING, #'DATA_PREPROCESSING',
     })

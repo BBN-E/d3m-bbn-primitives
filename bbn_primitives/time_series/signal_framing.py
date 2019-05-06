@@ -81,7 +81,7 @@ class SignalFramer(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.bbn.time_series.SignalFramer', #'d3m.primitives.time_series_segmentation.signal_framer.BBN',
+        'python_path': 'd3m.primitives.time_series_segmentation.SignalFramer.BBN',#'d3m.primitives.bbn.time_series.SignalFramer', #'d3m.primitives.time_series_segmentation.signal_framer.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.UNIFORM_TIME_SERIES_SEGMENTATION],

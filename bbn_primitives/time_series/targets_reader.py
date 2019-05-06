@@ -63,7 +63,7 @@ class TargetsReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyper
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.bbn.time_series.TargetsReader', #'d3m.primitives.data_preprocessing.targets_reader.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.TargetsReader.BBN',#'d3m.primitives.bbn.time_series.TargetsReader', #'d3m.primitives.data_preprocessing.targets_reader.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION],
         'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING,
     })

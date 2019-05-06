@@ -29,7 +29,7 @@ from . import __author__, __version__
 Inputs = d3m_dataframe
 Outputs = d3m_dataframe
 
-_logger = logging.getLogger('d3m.primitives.bbn.sklearn_wrap.BBNMLPClassifier')
+_logger = logging.getLogger('d3m.primitives.classification.mlp.BBNMLPClassifier')
 
 class Params(params.Params):
     coefs_: typing.List[np.ndarray]
@@ -211,7 +211,7 @@ class BBNMLPClassifier(SupervisedLearnerPrimitiveBase[Inputs, Outputs, Params, H
                     git_commit=__git_commit__, egg='bbn_primitives'
                 ),
             }],
-        'python_path': 'd3m.primitives.classification.BBNMLPClassifier.BBN', #'d3m.primitives.bbn.sklearn_wrap.BBNMLPClassifier', #'d3m.primitives.classification.mlp_classifier.BBN',
+        'python_path': 'd3m.primitives.classification.mlp.BBNMLPClassifier', #'d3m.primitives.bbn.sklearn_wrap.BBNMLPClassifier', #'d3m.primitives.classification.mlp_classifier.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.MODULAR_NEURAL_NETWORK], # TODO: replace by a new algorithm_type, e.g. ?
         'primitive_family': metadata_module.PrimitiveFamily.CLASSIFICATION,
     })

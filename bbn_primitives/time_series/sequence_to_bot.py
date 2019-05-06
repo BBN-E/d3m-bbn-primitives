@@ -27,7 +27,7 @@ from . import __author__, __version__
 Inputs = List #List[List[d3m_ndarray]]
 Outputs = d3m_dataframe
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.SequenceToBagOfTokens')
+_logger = logging.getLogger('d3m.primitives.data_transformation.sequence_to_bag_of_tokens.SequenceToBagOfTokens')
 
 class Params(params.Params):
     vocab: dict
@@ -74,7 +74,7 @@ class SequenceToBagOfTokens(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Pa
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.data_transformation.SequenceToBagOfTokens.BBN', #'d3m.primitives.bbn.time_series.SequenceToBagOfTokens', #'d3m.primitives.data_transformation.sequence_to_bag_of_tokens.BBN',
+        'python_path': 'd3m.primitives.data_transformation.sequence_to_bag_of_tokens.SequenceToBagOfTokens', #'d3m.primitives.bbn.time_series.SequenceToBagOfTokens', #'d3m.primitives.data_transformation.sequence_to_bag_of_tokens.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_PROFILING], # TODO: review before submission

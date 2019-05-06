@@ -21,7 +21,7 @@ from . import __author__, __version__
 Inputs = List #List[List[d3m_ndarray]]
 Outputs = List #List[List[d3m_ndarray]]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.SegmentCurveFitter')
+_logger = logging.getLogger('d3m.primitives.data_transformation.segment_curve_fitter.SegmentCurveFitter')
 
 class Hyperparams(hyperparams.Hyperparams):
     deg = hyperparams.Hyperparameter[int](
@@ -69,7 +69,7 @@ class SegmentCurveFitter(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, 
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.data_transformation.SegmentCurveFitter.BBN', #'d3m.primitives.bbn.time_series.SegmentCurveFitter', #'d3m.primitives.data_transformation.segment_curve_fitter.BBN',
+        'python_path': 'd3m.primitives.data_transformation.segment_curve_fitter.SegmentCurveFitter', #'d3m.primitives.bbn.time_series.SegmentCurveFitter', #'d3m.primitives.data_transformation.segment_curve_fitter.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.PARAMETRIC_TRAJECTORY_MODELING],

@@ -19,7 +19,7 @@ from .time_series_common import *
 Inputs = List #List[d3m_ndarray]
 Outputs = List #List[List[d3m_ndarray]]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.UniformSegmentation')
+_logger = logging.getLogger('d3m.primitives.time_series_segmentation.uniform_segmentation.UniformSegmentation')
 
 class Hyperparams(hyperparams.Hyperparams):
     seg_len = hyperparams.Hyperparameter[int](
@@ -75,7 +75,7 @@ class UniformSegmentation(FeaturizationTransformerPrimitiveBase[Inputs, Outputs,
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.time_series_segmentation.UniformSegmentation.BBN',#'d3m.primitives.bbn.time_series.UniformSegmentation', #'d3m.primitives.time_series_segmentation.uniform_segmentation.BBN',
+        'python_path': 'd3m.primitives.time_series_segmentation.uniform_segmentation.UniformSegmentation',#'d3m.primitives.bbn.time_series.UniformSegmentation', #'d3m.primitives.time_series_segmentation.uniform_segmentation.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.UNIFORM_TIME_SERIES_SEGMENTATION],

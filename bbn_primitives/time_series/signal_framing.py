@@ -17,7 +17,7 @@ from . import __author__, __version__
 Inputs = List #List[d3m_ndarray]
 Outputs = List #List[d3m_ndarray]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.SignalFramer')
+_logger = logging.getLogger('d3m.primitives.time_series_segmentation.signal_framer.SignalFramer')
 
 class Hyperparams(hyperparams.Hyperparams):
     frame_length_s = hyperparams.Bounded[float](
@@ -81,7 +81,7 @@ class SignalFramer(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.time_series_segmentation.SignalFramer.BBN',#'d3m.primitives.bbn.time_series.SignalFramer', #'d3m.primitives.time_series_segmentation.signal_framer.BBN',
+        'python_path': 'd3m.primitives.time_series_segmentation.signal_framer.SignalFramer',#'d3m.primitives.bbn.time_series.SignalFramer', #'d3m.primitives.time_series_segmentation.signal_framer.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.UNIFORM_TIME_SERIES_SEGMENTATION],

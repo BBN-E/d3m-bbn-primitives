@@ -23,7 +23,7 @@ from . import __author__, __version__
 Inputs = List #List[d3m_ndarray]
 Outputs = List #List[d3m_ndarray]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.SignalDither')
+_logger = logging.getLogger('d3m.primitives.data_preprocessing.signal_dither.SignalDither')
 
 class Hyperparams(hyperparams.Hyperparams):
     level = hyperparams.Bounded[float](
@@ -79,7 +79,7 @@ class SignalDither(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.data_preprocessing.SignalDither.BBN', #'d3m.primitives.bbn.time_series.SignalDither', #'d3m.primitives.data_preprocessing.signal_dither.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.signal_dither.SignalDither', #'d3m.primitives.bbn.time_series.SignalDither', #'d3m.primitives.data_preprocessing.signal_dither.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.SIGNAL_DITHERING],

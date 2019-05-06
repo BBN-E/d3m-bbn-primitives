@@ -17,7 +17,7 @@ from . import __author__, __version__
 Inputs = List #List[d3m_ndarray]
 Outputs = List #List[d3m_ndarray]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.ChannelAverager')
+_logger = logging.getLogger('d3m.primitives.data_preprocessing.channel_averager.ChannelAverager')
 
 class Hyperparams(hyperparams.Hyperparams):
     pass
@@ -61,7 +61,7 @@ class ChannelAverager(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyp
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.data_preprocessing.ChannelAverager.BBN', #'d3m.primitives.bbn.time_series.ChannelAverager', #'d3m.primitives.data_preprocessing.channel_averager.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.channel_averager.ChannelAverager', #'d3m.primitives.bbn.time_series.ChannelAverager', #'d3m.primitives.data_preprocessing.channel_averager.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.AUDIO_MIXING],
         'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING,
     })

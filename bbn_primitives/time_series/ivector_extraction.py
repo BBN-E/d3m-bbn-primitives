@@ -26,7 +26,7 @@ from . import __author__, __version__
 Inputs = List #List[d3m_ndarray]
 Outputs = d3m_dataframe
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.IvectorExtractor')
+_logger = logging.getLogger('d3m.primitives.data_transformation.i_vector_extractor.IVectorExtractor')
 
 class Params(params.Params):
     weights: ndarray
@@ -127,7 +127,7 @@ class IVectorExtractor(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Params,
                 git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.data_transformation.IVectorExtractor.BBN', #'d3m.primitives.bbn.time_series.IVectorExtractor', #'d3m.primitives.data_transformation.ivector_extractor.BBN',
+        'python_path': 'd3m.primitives.data_transformation.i_vector_extractor.IVectorExtractor', #'d3m.primitives.bbn.time_series.IVectorExtractor', #'d3m.primitives.data_transformation.ivector_extractor.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION],
         'primitive_family': metadata_module.PrimitiveFamily.DATA_TRANSFORMATION,
     })

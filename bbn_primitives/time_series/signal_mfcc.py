@@ -23,7 +23,7 @@ from . import __author__, __version__
 Inputs = List #List[d3m_ndarray]
 Outputs = List #List[d3m_ndarray]
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.SignalMFCC')
+_logger = logging.getLogger('d3m.primitives.feature_extraction.signal_mfcc.SignalMFCC')
 
 class Hyperparams(hyperparams.Hyperparams):
     ## TODO: sampling_rate should become metadata accompanying the input data - sample specific
@@ -125,7 +125,7 @@ class SignalMFCC(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpar
             ),
         }],
         # The same path the primitive is registered with entry points in setup.py.
-        'python_path': 'd3m.primitives.bbn.time_series.SignalMFCC', #'d3m.primitives.feature_extraction.signal_mfcc.BBN',
+        'python_path': 'd3m.primitives.feature_extraction.signal_mfcc.SignalMFCC', #'d3m.primitives.bbn.time_series.SignalMFCC', #'d3m.primitives.feature_extraction.signal_mfcc.BBN',
         # Choose these from a controlled vocabulary in the schema. If anything is missing which would
         # best describe the primitive, make a merge request.
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.MFCC_FEATURE_EXTRACTION],

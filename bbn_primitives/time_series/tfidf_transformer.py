@@ -27,7 +27,7 @@ from . import __author__, __version__
 Inputs = d3m_dataframe
 Outputs = d3m_dataframe
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.BBNTfidfTransformer')
+_logger = logging.getLogger('d3m.primitives.feature_extraction.tfidf_vectorizer.BBNTfidfTransformer')
 
 class Params(params.Params):
     _idf_diag: typing.Optional[csr_matrix]
@@ -102,7 +102,7 @@ class BBNTfidfTransformer(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Para
                 git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.bbn.time_series.BBNTfidfTransformer', #'d3m.primitives.feature_extraction.tfidf_transformer.BBN',
+        'python_path': 'd3m.primitives.feature_extraction.tfidf_vectorizer.BBNTfidfTransformer', #'d3m.primitives.bbn.time_series.BBNTfidfTransformer', #'d3m.primitives.feature_extraction.tfidf_transformer.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.FEATURE_SCALING], 
         'primitive_family': metadata_module.PrimitiveFamily.FEATURE_EXTRACTION, 
     })

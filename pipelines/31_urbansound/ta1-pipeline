@@ -399,7 +399,7 @@ def create_d3m_pipeline(proc_root, name = None):
 
     lout = pin
     #for module_name in [ 'd3m.primitives.datasets.Denormalize', 'd3m.primitives.datasets.DatasetToDataFrame', 'd3m.primitives.data.ExtractTargets' ]:
-    for module_name in [ 'd3m.primitives.bbn.time_series.TargetsReader', ]:
+    for module_name in [ 'd3m.primitives.data_preprocessing.targets_reader.TargetsReader', ]:
         package_name, class_name = module_name.rsplit('.', 1)
         if package_name not in packages:
             package_load = __import__(package_name, globals(), locals(), [ class_name, ])

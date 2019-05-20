@@ -9,7 +9,7 @@ __author__ = 'BBN'
 
 ## sub-packages
 from .audio_reader import AudioReader
-#from .csv_reader import CSVReader
+from .csv_reader import CSVReader
 from .channel_averaging import ChannelAverager
 from .signal_dither import SignalDither
 from .signal_framing import SignalFramer

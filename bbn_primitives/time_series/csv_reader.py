@@ -22,18 +22,24 @@ from d3m.primitive_interfaces.featurization import FeaturizationTransformerPrimi
 from . import __author__, __version__
 
 Inputs = Dataset
-Outputs = List[d3m_ndarray]
+Outputs = List #[d3m_ndarray]
 
 
-_logger = logging.getLogger('d3m.primitives.bbn.time_series.CSVReader')
+_logger = logging.getLogger('d3m.primitives.data_preprocessing.csv_reader.CSVReader')
 
 class Hyperparams(hyperparams.Hyperparams):
     resampling_rate = hyperparams.Bounded[float](
+        semantic_types = [
+		'https://metadata.datadrivendiscovery.org/types/ControlParameter',
+	],
         default = 1.0,
         lower = 0.0, upper = None,
         description = 'Resampling rate'
     )
     read_as_mono = hyperparams.Hyperparameter[bool](
+        semantic_types = [
+		'https://metadata.datadrivendiscovery.org/types/ControlParameter',
+	],
         default = True,
         #_structural_type = bool,
         description = 'Read csv'
@@ -74,9 +80,11 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.bbn.time_series.CSVReader',
-        'algorithm_types': ['DATA_CONVERSION'], # TODO: replace by a new algorithm_type, e.g. ?
-        'primitive_family': 'DATA_PREPROCESSING',
+        'python_path': 'd3m.primitives.data_preprocessing.csv_reader.CSVReader',
+        'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION], #['DATA_CONVERSION'], #  replaced 'AUDIO_MIXING'
+        'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING, 
+        #'algorithm_types': ['DATA_CONVERSION'], # TODO: replace by a new algorithm_type, e.g. ?
+        #'primitive_family': 'DATA_PREPROCESSING',
     })
 
     def __init__(
@@ -88,7 +96,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
         return
 
 
-    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> base.CallResult[Outputs]:
+    def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
         """
         Arguments:
             - inputs: [ num_samples, num_channels ]
@@ -134,7 +142,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
             outputs.metadata = metadata
 
         if timer.state == timer.EXECUTED:
-            return base.CallResult(outputs)
+            return CallResult(outputs)
         else:
             raise TimeoutError('Reader exceeded time limit')
 

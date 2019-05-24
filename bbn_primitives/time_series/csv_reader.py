@@ -62,6 +62,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
         'keywords': [],
         'source': {
             'name': __author__,
+            'contact':'mailto:prasannakumar.muthukumar@raytheon.com',
             'uris': [
                 'https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/csv_reader.py'.format(
                     git_commit=__git_commit__
@@ -115,6 +116,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
             metadata = self.__class__._can_accept(self = self,
                           method_name = 'produce',
                           arguments = { 'inputs': inputs.metadata, },
+                          hyperparams = self.hyperparams,
                           outputs = outputs
                         )
 
@@ -148,14 +150,14 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
 
     @classmethod
     def can_accept(cls, *, method_name: str, arguments: typing.Dict[str, typing.Union[metadata_module.Metadata, type]]) -> typing.Optional[metadata_module.DataMetadata]:
-        output_metadata = super().can_accept(method_name=method_name, arguments=arguments)
+        output_metadata = super().can_accept(method_name=method_name, arguments=arguments, hyperparams=hyperparams)
 
         return cls._can_accept(self = cls, method_name = method_name,
-                                arguments = arguments, outputs = Outputs())
+                                arguments = arguments,hyperparams=hyperparams ,outputs = Outputs())
 
     @classmethod
-    def _can_accept(cls, *, self, method_name: str, arguments: typing.Dict[str, typing.Union[metadata_module.Metadata, type]], outputs: Outputs) -> typing.Optional[metadata_module.DataMetadata]:
-        output_metadata = super().can_accept(method_name=method_name, arguments=arguments)
+    def _can_accept(cls, *, self, method_name: str, arguments: typing.Dict[str, typing.Union[metadata_module.Metadata, type]],hyperparams: Hyperparams, outputs: Outputs) -> typing.Optional[metadata_module.DataMetadata]:
+        output_metadata = super().can_accept(method_name=method_name, arguments=arguments, hyperparams=hyperparams)
 
         if 'inputs' not in arguments:
             return output_metadata
@@ -219,7 +221,8 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
         mdlu = cls._init_metadata_lookup()
 
         num_res = metadata.query(())['dimension']['length']
-        resources = [ str(x) for x in range(num_res) ]
+        resources = [ str(x) for x in range(num_res-1) ]
+        resources.append('learningData')
         primary_key = [ [ (res_id, metadata_module.ALL_ELEMENTS, col_id) for col_id in range(metadata.query((res_id, metadata_module.ALL_ELEMENTS))['dimension']['length'])
                                       if 'd3mIndex' == metadata.query((res_id, metadata_module.ALL_ELEMENTS, col_id))['name'] ]
                                    for res_id in resources ]
@@ -244,7 +247,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
                         foreign_resource_md = metadata.query((foreign_resource_id,))
                         foreign_col_selector = (foreign_resource_id, metadata_module.ALL_ELEMENTS, cmd['foreign_key']['column_index'])
                         foreign_col_md = metadata.query(foreign_col_selector)
-                        if csv_res_type in foreign_resource_md['semantic_types'] and \
+                        if csv_res_type in foreign_col_md['semantic_types'] and \
                             'https://metadata.datadrivendiscovery.org/types/FileName' in foreign_col_md['semantic_types']:
                                 cls._update_metadata_lookup(mdlu,
                                     'csv_fn',

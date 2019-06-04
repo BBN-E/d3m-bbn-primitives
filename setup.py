@@ -62,7 +62,7 @@ setup(
         'd3m.primitives': [
             'data_preprocessing.audio_reader.AudioReader = bbn_primitives.time_series.audio_reader:AudioReader',
             'data_preprocessing.targets_reader.TargetsReader = bbn_primitives.time_series.targets_reader:TargetsReader',
-             #'bbn.time_series.CSVReader = bbn_primitives.time_series.csv_reader:CSVReader',
+            'data_preprocessing.csv_reader.CSVReader = bbn_primitives.time_series.csv_reader:CSVReader',
             'data_preprocessing.channel_averager.ChannelAverager = bbn_primitives.time_series.channel_averaging:ChannelAverager',
             'time_series_segmentation.signal_framer.SignalFramer = bbn_primitives.time_series.signal_framing:SignalFramer',
             'data_preprocessing.signal_dither.SignalDither = bbn_primitives.time_series.signal_dither:SignalDither',

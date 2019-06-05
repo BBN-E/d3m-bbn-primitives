@@ -7,7 +7,8 @@ TARDIR=`pwd`/annotations
 SRC_PIPELINES_DIR=/validation_output
 
 #primitives=$(python3.6 -m d3m.index search 2>/dev/null| grep d3m.primitives.bbn)
-primitives="d3m.primitives.data_preprocessing.audio_reader.AudioReader
+primitives="d3m.primitives.data_preprocessing.csv_reader.CSVReader
+d3m.primitives.data_preprocessing.audio_reader.AudioReader
 d3m.primitives.data_preprocessing.channel_averager.ChannelAverager
 d3m.primitives.clustering.cluster_curve_fitting_kmeans.ClusterCurveFittingKMeans
 d3m.primitives.data_transformation.i_vector_extractor.IVectorExtractor

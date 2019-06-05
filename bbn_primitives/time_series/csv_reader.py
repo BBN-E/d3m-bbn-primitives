@@ -57,10 +57,10 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
         'source': {
             'name': __author__,
             'uris': [
-                'https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/csv_reader.py'.format(
+                'https://github.com/BBN-E/d3m-bbn-primitives/blob/{git_commit}/bbn_primitives/time_series/csv_reader.py'.format(
                     git_commit=__git_commit__
                 ),
-                'https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives.git',
+                'https://github.com/BBN-E/d3m-bbn-primitives.git',
             ],
         },
         'installation': [{
@@ -70,7 +70,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
             },
             {
                 'type': 'PIP',
-                'package_uri': 'git+https://gitlab.datadrivendiscovery.org/BBN/d3m-bbn-primitives.git@{git_commit}#egg={egg}'.format(
+                'package_uri': 'git+https://github.com/BBN-E/d3m-bbn-primitives.git@{git_commit}#egg={egg}'.format(
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],

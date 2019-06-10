@@ -29,7 +29,7 @@ from . import __author__, __version__
 Inputs = d3m_dataframe
 Outputs = d3m_dataframe
 
-_logger = logging.getLogger('d3m.primitives.classification.mlp.BBN)
+_logger = logging.getLogger('d3m.primitives.classification.mlp.BBN')
 
 class Params(params.Params):
     coefs_: typing.List[np.ndarray]

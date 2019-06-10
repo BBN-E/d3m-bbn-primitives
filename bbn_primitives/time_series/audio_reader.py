@@ -23,7 +23,7 @@ Inputs = Dataset
 Outputs = List #List[d3m_ndarray]
 
 #_logger = logging.getLogger(AudioReader.metadata.query()['python_path'])
-_logger = logging.getLogger('d3m.primitives.data_preprocessing.audio_reader.AudioReader') #('d3m.primitives.bbn.time_series.AudioReader')
+_logger = logging.getLogger('d3m.primitives.data_preprocessing.audio_reader.BBN') #('d3m.primitives.bbn.time_series.AudioReader')
 
 class Hyperparams(hyperparams.Hyperparams):
     resampling_rate = hyperparams.Bounded[float](
@@ -85,7 +85,7 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.data_preprocessing.audio_reader.AudioReader', #'d3m.primitives.bbn.time_series.AudioReader', #'d3m.primitives.data_preprocessing.audio_reader.BBN',
+        'python_path': 'd3m.primitives.data_preprocessing.audio_reader.BBN', #'d3m.primitives.bbn.time_series.AudioReader', #'d3m.primitives.data_preprocessing.audio_reader.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION], #['DATA_CONVERSION'], #  replaced 'AUDIO_MIXING'
         'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING, #'DATA_PREPROCESSING',
     })

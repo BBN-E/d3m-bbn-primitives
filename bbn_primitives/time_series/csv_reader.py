@@ -25,7 +25,7 @@ Inputs = Dataset
 Outputs = List #[d3m_ndarray]
 
 
-_logger = logging.getLogger('d3m.primitives.data_preprocessing.csv_reader.CSVReader')
+_logger = logging.getLogger('d3m.primitives.data_preprocessing.csv_reader.BBN')
 
 class Hyperparams(hyperparams.Hyperparams):
     resampling_rate = hyperparams.Bounded[float](
@@ -55,10 +55,10 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
 
     __git_commit__=utils.current_git_commit(os.path.dirname(__file__))
     metadata = metadata_module.PrimitiveMetadata({
-        'id': '503e69a1-5fc4-4f14-912a-4b564cb1b171',
+        'id': 'a771e153-67d7-4f69-b5f9-1a764e502a23',
         'version': __version__,
         'name': "CSV Reader",
-        'description': "BBN D3M CSV Reader Primitive.",
+        'description': "BBN D3M CSV Reader Primitive reads csv files for time series problems. It is desgined specifically for timeseries dataset. It helps to run with other BBN time series primtivies.",
         'keywords': [],
         'source': {
             'name': __author__,
@@ -81,7 +81,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
                     git_commit=__git_commit__, egg='bbn_primitives'
             ),
         }],
-        'python_path': 'd3m.primitives.data_preprocessing.csv_reader.CSVReader',
+        'python_path': 'd3m.primitives.data_preprocessing.csv_reader.BBN',
         'algorithm_types': [metadata_module.PrimitiveAlgorithmType.DATA_CONVERSION], #['DATA_CONVERSION'], #  replaced 'AUDIO_MIXING'
         'primitive_family': metadata_module.PrimitiveFamily.DATA_PREPROCESSING, 
         #'algorithm_types': ['DATA_CONVERSION'], # TODO: replace by a new algorithm_type, e.g. ?

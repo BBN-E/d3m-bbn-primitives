@@ -168,8 +168,8 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
     def _can_accept(cls, *, self, method_name: str,
     		    arguments: typing.Dict[str, typing.Union[metadata_module.Metadata, type]],
 		    hyperparams: Hyperparams, outputs: Outputs) -> typing.Optional[metadata_module.DataMetadata]:
-        output_metadata = super().can_accept(method_name=method_name, arguments=arguments,
-						hyperparams=hyperparams)
+        #output_metadata = super().can_accept(method_name=method_name, arguments=arguments,
+	#					hyperparams=hyperparams)
 
         if 'inputs' not in arguments:
             return output_metadata

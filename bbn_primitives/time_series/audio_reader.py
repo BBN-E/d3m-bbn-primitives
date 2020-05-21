@@ -136,9 +136,12 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
                 start = 0
                 end = len(audio_clip)
                 if metadata_lookup['audio_start_time']['found']:
-                    start = int(sampling_rate * float(row[metadata_lookup['audio_start_time']['selector'][-1]]))
-                if metadata_lookup['audio_end_time']['found']:
-                    end = int(sampling_rate * float(row[metadata_lookup['audio_end_time']['selector'][-1]]))
+                    startend = (row[metadata_lookup['audio_start_time']['selector'][-1]])
+                    start = int( sampling_rate * float(startend.split(',')[0]))
+                    end = int(sampling_rate * float(startend.split(',')[1]))
+                    #start = int(sampling_rate * float(row[metadata_lookup['audio_start_time']['selector'][-1]]))
+                #if metadata_lookup['audio_end_time']['found']:
+                    #end = int(sampling_rate * float(row[metadata_lookup['audio_end_time']['selector'][-1]]))
                 audio_clip = audio_clip[start:end]
 
                 outputs.append(d3m_ndarray(audio_clip))
@@ -295,12 +298,12 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
                     else:
                         _logger.warning('Unexpected semantic type Attribute')
                 elif 'https://metadata.datadrivendiscovery.org/types/Boundary' in st:
-                    if cmd['name'] == 'start':
+                    if cmd['name'] == 'start-end-time-slice-of-recording':
                         cls._update_metadata_lookup(mdlu, 'audio_start_time',
                             (mdlu['primary_resource_id']['selector'][0], metadata_module.ALL_ELEMENTS, col_name)
                           )
                         pass
-                    elif cmd['name'] == 'end':
+                    elif cmd['name'] == 'start-end-time-slice-of-recording':
                         cls._update_metadata_lookup(mdlu, 'audio_end_time',
                             (mdlu['primary_resource_id']['selector'][0], metadata_module.ALL_ELEMENTS, col_name)
                           )
@@ -311,8 +314,8 @@ class AudioReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpa
                     _logger.warning('Semantic type InstanceWeight recognized but unused in the current implementation')
                 elif 'https://metadata.datadrivendiscovery.org/types/SuggestedTarget' in st:
                     _logger.info('Semantic type SuggestedTarget is ignored by this primitive')
-                else:
-                    raise Exception('Semantic type(s) %s does not match any supported types' % (st))
+                #else:
+                #    raise Exception('Semantic type(s) %s does not match any supported types' % (st))
 
         #audio_res_type = 'http://schema.org/AudioObject'
         #audio_fn_resource_ids = [ res_id for res_id in resources

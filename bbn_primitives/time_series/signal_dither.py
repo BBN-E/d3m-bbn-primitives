@@ -91,6 +91,7 @@ class SignalDither(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
         docker_containers: typing.Dict[str, DockerContainer] = None
     ) -> None:
         super().__init__(hyperparams=hyperparams, random_seed=random_seed, docker_containers=docker_containers)
+        self._random_state = np.random.RandomState(self.random_seed)
         return
 
     def produce(self, *, inputs: Inputs, timeout: float = None, iterations: int = None) -> CallResult[Outputs]:
@@ -107,8 +108,8 @@ class SignalDither(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperp
 
             for cinput in inputs:
                 if self.hyperparams['reseed']:
-                    np.random.seed(self.random_seed)
-                coutput = cinput + self.hyperparams['level'] * (np.random.rand(*cinput.shape)*2-1)
+                    self._random_state.seed(self.random_seed)
+                coutput = cinput + self.hyperparams['level'] * (self._random_state.rand(*cinput.shape)*2-1)
                 outputs.append(d3m_ndarray(coutput, generate_metadata=False))
 
 

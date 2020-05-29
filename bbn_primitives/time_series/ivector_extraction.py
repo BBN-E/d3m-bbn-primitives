@@ -139,6 +139,7 @@ class IVectorExtractor(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Params,
         super().__init__(hyperparams=hyperparams, random_seed=random_seed, docker_containers=docker_containers)
 
         self._training_inputs = None
+        self._random_state = np.random.RandomState(self.random_seed)
         self._gmm = GaussianMixture(
                 n_components = self.hyperparams['num_gauss'],
                 covariance_type = self.hyperparams['gmm_covariance_type'],
@@ -170,7 +171,7 @@ class IVectorExtractor(UnsupervisedLearnerPrimitiveBase[Inputs, Outputs, Params,
                   ))
 
             # Train i-vector extractor
-            self._v = np.random.randn(self._gmm.n_components*self._gmm.means_.shape[1],
+            self._v = self._random_state.randn(self._gmm.n_components*self._gmm.means_.shape[1],
                                         self.hyperparams['ivec_dim'])
             _logger.info('Training i-vector extractor')
             N = np.zeros((num_data, self._gmm.n_components))

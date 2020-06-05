@@ -55,7 +55,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
 
     __git_commit__=utils.current_git_commit(os.path.dirname(__file__))
     metadata = metadata_module.PrimitiveMetadata({
-        'id': '503e69a1-5fc4-4f14-912a-4b564cb1b171',
+        'id': 'a771e153-67d7-4f69-b5f9-1a764e502a23',
         'version': __version__,
         'name': "CSV Reader",
         'description': "BBN D3M CSV Reader Primitive.",
@@ -127,12 +127,10 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
                 #d3mIndex = row[metadata_lookup['primary_key']['selector'][-1]]
                 d3mIndex=row['d3mIndex']
                 csv_fn = row[metadata_lookup['csv_fn']['selector'][-1]]
-
                 filename = os.path.join(csv_location_base_uris, csv_fn)
-                filename = re.sub('^file://', '', filename)
-                print(filename)
+                filename = re.sub('^file://', '', filename)                
                 #csv_file= csv.load(filename)
-                csv_file=pd.read_csv(filename,index_col=0)
+                csv_file=pd.read_csv(filename,index_col=0)                
                 start = 0
                 end = len(csv_file)
 
@@ -157,7 +155,7 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
 
     @classmethod
     def _can_accept(cls, *, self, method_name: str, arguments: typing.Dict[str, typing.Union[metadata_module.Metadata, type]],hyperparams: Hyperparams, outputs: Outputs) -> typing.Optional[metadata_module.DataMetadata]:
-        output_metadata = super().can_accept(method_name=method_name, arguments=arguments, hyperparams=hyperparams)
+        #output_metadata = super().can_accept(method_name=method_name, arguments=arguments, hyperparams=hyperparams)
 
         if 'inputs' not in arguments:
             return output_metadata
@@ -265,8 +263,8 @@ class CSVReader(FeaturizationTransformerPrimitiveBase[Inputs, Outputs, Hyperpara
                     _logger.warning('Semantic type InstanceWeight recognized but unused in the current implementation')
                 elif 'https://metadata.datadrivendiscovery.org/types/SuggestedTarget' in st:
                     _logger.info('Semantic type SuggestedTarget is ignored by this primitive')
-                else:
-                    raise Exception('Semantic type(s) %s does not match any supported types' % (st))
+                #else:
+                    #raise Exception('Semantic type(s) %s does not match any supported types' % (st))
 
        
         return mdlu if cls._valid_metadata_lookup(mdlu) else None

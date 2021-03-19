@@ -48,6 +48,7 @@ setup(
     version=read_package_variable('__version__'),
     description='BBN D3M primitives',
     author='BBN',
+    license='MIT',
     #packages=['d3m-bbn-primitives', 'd3m-bbn-primitives.bbn_primitives.time_series'],
     #packages=find_packages('time_series'),
     packages=find_packages(exclude=['examples', 'notebooks', 'pipelines', 'annotations', 'tools']),
